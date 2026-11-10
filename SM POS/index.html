@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sari-Sari Store POS</title>
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+ 
+  <!-- Top Navigation Header -->
+  <header class="navbar">
+    <div class="brand">
+      <i class="fa-solid fa-store"></i>
+      <span>SM Store POS</span>
+    </div>
+    <div class="nav-links">
+      <button class="nav-btn active" data-tab="posView"><i class="fa-solid fa-cart-shopping"></i> POS</button>
+      <button class="nav-btn" data-tab="transactionsView"><i class="fa-solid fa-list-check"></i> Transactions</button>
+      <button class="nav-btn" data-tab="reportsView"><i class="fa-solid fa-chart-column"></i> Reports</button>
+    </div>
+  </header>
+ 
+  <!-- Main Views Container -->
+  <main class="content-area">
+ 
+    <!-- 1. POS VIEW -->
+    <section id="posView" class="tab-view active">
+      <div class="main-container">
+        
+        <!-- Products Column -->
+        <div class="products-section">
+          <div class="filter-bar">
+            <div class="search-wrapper">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="text" id="searchInput" class="search-input" placeholder="Search products...">
+            </div>
+            <select id="categoryFilter" class="category-select">
+              <option value="">All Categories</option>
+            </select>
+            <input type="number" id="minPriceInput" class="price-input" placeholder="Min ₱" min="0">
+            <input type="number" id="maxPriceInput" class="price-input" placeholder="Max ₱" min="0">
+          </div>
+ 
+          <div class="product-grid" id="productGrid"></div>
+          <div class="products-footer" id="productsFooter">0 of 0 products</div>
+        </div>
+ 
+        <!-- Cart Sidebar -->
+        <div class="cart-sidebar">
+          
+          <!-- State A: Cart Items Panel -->
+          <div id="cartMainPanel" class="panel-step active">
+            <div class="cart-header">
+              <i class="fa-solid fa-basket-shopping"></i> Cart <span id="cartBadge" class="badge">0</span>
+            </div>
+ 
+            <input type="text" id="customerName" class="customer-input" placeholder="Customer name (required for Utang)">
+ 
+            <div class="type-selector">
+              <button class="type-btn active" data-type="Regular">Regular</button>
+              <button class="type-btn" data-type="Senior">Senior</button>
+              <button class="type-btn" data-type="PWD">PWD</button>
+            </div>
+ 
+            <div class="cart-body" id="cartBody">
+              <p class="empty-msg">Select products to add</p>
+            </div>
+ 
+            <div class="cart-summary" id="cartSummary">
+              <!-- Dynamically populated totals -->
+            </div>
+ 
+            <button id="proceedPaymentBtn" class="btn-checkout" disabled>Proceed to Payment</button>
+          </div>
+ 
+          <!-- State B: Payment Panel -->
+          <div id="paymentPanel" class="panel-step">
+            <div class="cart-header">
+              <i class="fa-solid fa-basket-shopping"></i> Cart <span id="cartBadgePay" class="badge">0</span>
+            </div>
+ 
+            <div class="payment-box">
+              <div id="paymentBreakdown" class="summary-breakdown"></div>
+
+              <div class="method-selector">
+                <button class="method-btn active" data-method="Cash"><i class="fa-solid fa-money-bill-wave"></i> Cash</button>
+                <button class="method-btn" data-method="GCash"><i class="fa-solid fa-mobile-screen-button"></i> GCash</button>
+                <button class="method-btn" data-method="Utang"><i class="fa-solid fa-handshake"></i> Utang</button>
+              </div>
+
+              <!-- Cash sub-panel -->
+              <div id="cashBox">
+                <div class="input-group">
+                  <label>Cash Payment (₱)</label>
+                  <input type="number" id="cashTendered" class="cash-input" placeholder="Min. ₱0.00">
+                </div>
+ 
+                <div id="changeBox" class="change-display" style="display: none;">
+                  <span class="label">Change</span>
+                  <span class="value" id="changeAmount">₱0.00</span>
+                </div>
+              </div>
+
+              <!-- GCash sub-panel -->
+              <div id="gcashBox" class="gcash-box" style="display:none;">
+                <div class="input-group">
+                  <label>GCash Reference No. (optional)</label>
+                  <input type="text" id="gcashRef" class="gcash-input" inputmode="numeric" placeholder="e.g. 1234567890123">
+                </div>
+                <p class="gcash-note"><i class="fa-solid fa-circle-info"></i> Confirm the GCash payment has been received in full before proceeding.</p>
+              </div>
+
+              <!-- Utang sub-panel -->
+              <div id="utangBox" class="utang-box" style="display:none;">
+                <p class="utang-note">This sale will be recorded as <strong>utang (credit)</strong> under:</p>
+                <p class="utang-customer" id="utangCustomerLabel">—</p>
+                <p class="utang-warning" id="utangWarning" style="display:none;"><i class="fa-solid fa-triangle-exclamation"></i> Enter the customer's name in the cart before recording utang.</p>
+
+                <div class="input-group">
+                  <label>Contact Number (optional)</label>
+                  <input type="text" id="utangContact" class="utang-input" inputmode="numeric" placeholder="e.g. 09171234567">
+                </div>
+
+                <div class="input-group">
+                  <label>Address (optional)</label>
+                  <input type="text" id="utangAddress" class="utang-input" placeholder="e.g. Purok 3, Brgy. Consolacion">
+                </div>
+              </div>
+            </div>
+ 
+            <div class="payment-actions">
+              <button id="backToCartBtn" class="btn-secondary">Back</button>
+              <button id="confirmPaymentBtn" class="btn-primary" disabled>Confirm</button>
+            </div>
+          </div>
+ 
+        </div>
+ 
+      </div>
+    </section>
+ 
+    <!-- 2. TRANSACTIONS VIEW -->
+    <section id="transactionsView" class="tab-view">
+      <div class="view-header">
+        <div>
+          <h2>Transaction History</h2>
+          <p id="txSummaryText">0 transactions · Total Sales: ₱0.00 · VAT Collected: ₱0.00</p>
+        </div>
+        <div class="search-wrapper" style="width: 280px;">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" id="txSearchInput" class="search-input" placeholder="Search by ID or customer...">
+        </div>
+      </div>
+ 
+      <div class="table-container" id="txTableContainer">
+        <div class="empty-state">No transactions recorded yet.</div>
+      </div>
+    </section>
+ 
+    <!-- 3. REPORTS VIEW -->
+    <section id="reportsView" class="tab-view">
+      <div class="reports-container" id="reportsContainer">
+        <div class="empty-state">No data yet. Complete transactions to see reports.</div>
+      </div>
+    </section>
+ 
+  </main>
+ 
+  <!-- Receipt Modal Popup -->
+  <div id="receiptModal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <span class="modal-title"><i class="fa-regular fa-circle-check"></i> Transaction Complete</span>
+        <button id="closeModalIcon" class="btn-close">&times;</button>
+      </div>
+ 
+      <div class="receipt-paper" id="receiptPaper">
+        <!-- Built dynamically via JS -->
+      </div>
+ 
+      <div class="modal-actions">
+        <button id="printReceiptBtn" class="btn-secondary"><i class="fa-solid fa-print"></i> Print</button>
+        <button id="newTxBtn" class="btn-primary">New Transaction</button>
+      </div>
+    </div>
+  </div>
+ 
+  <script src="sarisari.js"></script>
+</body>
+</html>
